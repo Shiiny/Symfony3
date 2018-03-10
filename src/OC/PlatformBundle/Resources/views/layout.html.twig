@@ -1,0 +1,31 @@
+{% extends "@OCCore/layout.html.twig" %}
+
+{% block title %}
+    Annonces - {{ parent() }}
+{% endblock %}
+
+{% block body %}
+	<div class="col-md-12">
+		<a href="{{ path('oc_core_homepage') }}"><i class="glyphicon glyphicon-home"></i> Accueil</a>
+	</div>
+
+	<div id="menu" class="col-md-3">
+		<h3>Les annonces</h3>
+		<ul class="nav nav-pills nav-stacked">
+			<li><a href="{{ path('oc_platform_home') }}">Annonces</a></li>
+    		<li><a href="{{ path('oc_platform_add') }}">Ajouter une annonce</a></li>
+		</ul>
+
+		<h4>Dernières annonces</h4>
+       		{{ render(controller("OCPlatformBundle:Advert:menu", {'limit': 3})) }}
+    </div>
+
+    <div id="content" class="col-md-9">
+	    <h1>Annonces</h1>
+	    <hr>
+	    {% block ocplatform_body %}
+	        
+	    {% endblock %}
+    </div>
+
+{% endblock %}

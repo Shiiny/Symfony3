@@ -1,0 +1,29 @@
+{% extends "@OCCore/layout.html.twig" %}
+
+{% block title %}
+  Accueil - {{ parent() }}
+{% endblock %}
+
+{% block body %}
+<div id="content" class="col-md-12">
+  <h1>Page d'accueil de notre site</h1>
+
+  {% for message in app.session.flashbag.get('info') %}
+    <div class="alert alert-info" role="alert">
+        <p>Message flash : {{ message }}</p>
+    </div>
+  {% endfor %}
+
+    <h2>Liste des dernières annonces</h2>
+    {#{{ render(controller("OCPlatformBundle:Advert:menu", {'limit': 3})) }}#}
+    <ul>
+  	{% for advert in listAdverts %}
+  	    <li>
+  	    	<a href="{{ path('oc_platform_view', {'id': advert.id}) }}">{{ advert.title }}</a> par {{ advert.author }}, le {{ advert.date|date('d/m/Y') }}
+  	    </li>
+  	{% else %}
+  		<li>Pas (encore !) d'annonces</li>        
+  	{% endfor %}
+  </ul>
+</div>
+{% endblock %}

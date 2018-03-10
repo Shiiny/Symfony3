@@ -1,0 +1,4 @@
+services:
+    oc_platform.antispam:
+        class: OC\PlatformBundle\Antispam\OCAntispam
+        arguments: ["@mailer", 50, "%locale%"]
