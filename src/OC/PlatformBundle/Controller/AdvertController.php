@@ -61,29 +61,55 @@ class AdvertController extends Controller
         $em = $this->getDoctrine()->getManager();
 
         // Création de l'entité Advert
-        /*
-        $advert = new Advert();
-        $advert->setTitle('Offre de stage webdesigner')
-        ->setAuthor('Hugo')
-        ->setContent("Nous proposons un poste pour webdesigner. Blabla…");
 
+        $advert = new Advert();
+
+        $advert->setTitle('Recherche développeur Symfony')
+        ->setAuthor('Alexandre')
+        ->setContent("Nous un développeur Symfony débutant pour un poste basé sur Lyon. Blabla…");
+        
         // création de l'entité ImageEntity
+        
         $img = new ImageEntity();
         $img->setUrl('http://sdz-upload.s3.amazonaws.com/prod/upload/job-de-reve.jpg')
         ->setAlt('Job de rêve');
 
         // Jointure
-        $advert->setImage($img);
-
-        $em = $this->getDoctrine()->getManager();
-        $em->persist($advert);
-        $em->flush();
-        
+        $advert->setImage($img); 
 
         // Création d'une candid
-        $app1 = new Application();
-        $app1->setAuthor('Marine')
+        
+        $app = new Application();
+        $app->setAuthor('Marine')
         ->setContent("J'ai toutes les qualités requises.");
+
+        $app->setAdvert($advert);
+
+        $em->persist($advert);
+        $em->persist($app);
+        $em->flush();   
+
+
+        $advert1 = new Advert();
+
+        $advert1->setTitle('Mission de webmaster H/F')
+        ->setAuthor('Fred')
+        ->setContent("Pour une mission de 6 mois, nous recherchons un webmaster pour la maintenabilité de site. Blabla…");
+
+        $em->persist($advert1);
+        $em->flush();
+
+        $advert2 = new Advert();
+
+        $advert2->setTitle('Offre de stage webdesigner')
+        ->setAuthor('Hugo')
+        ->setContent("Nous proposons un poste pour webdesigner. Blabla…");
+
+        // Création d'une candid
+        
+        $app1 = new Application();
+        $app1->setAuthor('Julie')
+        ->setContent("Je suis hyper motivée.");
 
         // Création d'une candid2 pour exemple
         $app2 = new Application();
@@ -91,16 +117,14 @@ class AdvertController extends Controller
         ->setContent("J'aimerais bien suivre ce stage.");
 
         // Jointure des candids à l'annonce
-        //$app1->setAdvert($advert);
-        $app2->setAdvert($advert);
+        $app1->setAdvert($advert2);
+        $app2->setAdvert($advert2);
 
-        $em->persist($advert);
-        //$em->persist($app1);
+        $em->persist($advert2);
+        $em->persist($app1);
         $em->persist($app2);
 
-
-        $em->flush();
-        */
+        $em->flush();      
 
         /*if($request->isMethod('POST')) {
             $request->getSession()->getFlashBag()->add('notice', 'Annonce bien enregistrée.');
