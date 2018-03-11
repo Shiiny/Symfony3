@@ -9,6 +9,8 @@ use Symfony\Component\HttpFoundation\Response;
 use OC\PlatformBundle\Entity\Advert;
 use OC\PlatformBundle\Entity\ImageEntity;
 use OC\PlatformBundle\Entity\Application;
+use OC\PlatformBundle\Entity\Skill;
+use OC\PlatformBundle\Entity\AdvertSkill;
 
 
 class AdvertController extends Controller
@@ -20,7 +22,7 @@ class AdvertController extends Controller
         }
         $em = $this->getDoctrine()->getManager();
         $repository = $em->getRepository('OCPlatformBundle:Advert');
-        $listAdverts = $repository->findAll();
+        $listAdverts = $repository->myFindAll();
 
 
         return $this->render('@OCPlatform/Advert/index.html.twig', compact('listAdverts'));
@@ -28,11 +30,9 @@ class AdvertController extends Controller
 
     public function menuAction($limit)
     {
-        $listAdverts = array(
-            ['id' => 12, 'title' => "Recherche développeur Symfony"],
-            ['id' => 13, 'title' => "Mission de webmaster H/F"],
-            ['id' => 14, 'title' => "Offre de stage webdesigner"],
-        );
+        $repository = $this->getDoctrine()->getManager()->getRepository('OCPlatformBundle:Advert');
+
+        $listAdverts = $repository->findBy([],['date' => 'desc'], 3);
 
 
         return $this->render('@OCPlatform/Advert/menu.html.twig', compact('listAdverts'));
@@ -42,7 +42,7 @@ class AdvertController extends Controller
     {
         // On affiche l'annonce correspondante à l'id
         $em = $this->getDoctrine()->getManager();
-        $advert = $em->getRepository('OCPlatformBundle:Advert')->find($id);
+        $advert = $em->getRepository('OCPlatformBundle:Advert')->myFindOne($id);
 
         if($advert === null) {
             throw new NotFoundHttpException("L'annonce d'id".$id." n'existe pas.");  
@@ -53,7 +53,14 @@ class AdvertController extends Controller
         $listApplications = $em->getRepository('OCPlatformBundle:Application')
                                ->findBy(compact('advert'));
 
-        return $this->render('@OCPlatform/Advert/view.html.twig', compact('advert', 'listApplications'));
+        $listAdvertSkills = $em->getRepository('OCPlatformBundle:AdvertSkill')
+                                ->findBy(compact('advert'));
+
+        $advertCat = $em->getRepository('OCPlatformBundle:Advert')->getAdvertWithCategories(array('Développement web', 'Intégration'));
+
+        dump($advertCat);
+
+        return $this->render('@OCPlatform/Advert/view.html.twig', compact('advert', 'listApplications', 'listAdvertSkills'));
     }
 
     public function addAction(Request $request)
@@ -95,6 +102,16 @@ class AdvertController extends Controller
         $advert1->setTitle('Mission de webmaster H/F')
         ->setAuthor('Fred')
         ->setContent("Pour une mission de 6 mois, nous recherchons un webmaster pour la maintenabilité de site. Blabla…");
+
+        $listSkills = $em->getRepository('OCPlatformBundle:Skill')->findAll();
+        foreach ($listSkills as $skill) {
+            $advertSkill = new AdvertSkill();
+            $advertSkill->setAdvert($advert1);
+            $advertSkill->setSkill($skill);
+            $advertSkill->setLevel('Expert');
+
+            $em->persist($advertSkill);
+        }
 
         $em->persist($advert1);
         $em->flush();
@@ -152,11 +169,14 @@ class AdvertController extends Controller
         }
 
         // Récupère toutes les catégories de la DB
-        $listCategories = $em->getRepository('OCPlatformBundle:Category')->findAll();
+        /*$listCategories = $em->getRepository('OCPlatformBundle:Category')->findAll();
 
         foreach ($listCategories as $category) {
             $advert->addCategory($category);
-        }
+        }*/
+        $advert->setContent("L'annonce n'est plus à pourvoir.");
+        //$advert->setContent("Nous proposons un poste pour webdesigner. Blabla…");
+        $em->persist($advert);
 
         $em->flush();
 
@@ -165,7 +185,8 @@ class AdvertController extends Controller
 
             return $this->redirectToRoute('oc_platform_view', compact('id'));
         }*/
-        return $this->render('@OCPlatform/Advert/edit.html.twig', compact('id'));
+        //return $this->render('@OCPlatform/Advert/edit.html.twig', compact('id'));
+        return $this->redirectToRoute('oc_platform_view', compact('id'));
     }
 
     public function deleteAction($id)
