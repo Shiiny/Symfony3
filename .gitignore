@@ -1,17 +1,10 @@
-/.web-server-pid
-/app/config/parameters.yml
-/build/
+# Ignore les répertoires de symfony sur lesquels je n'interviens pas
+/app/*
+!/app/config/routing.yml
+!/app/AppKernel.php
 /phpunit.xml
+/bin/*
 /var/*
-!/var/cache
-/var/cache/*
-!var/cache/.gitkeep
-!/var/logs
-/var/logs/*
-!var/logs/.gitkeep
-!/var/sessions
-/var/sessions/*
-!var/sessions/.gitkeep
-!var/SymfonyRequirements.php
-/vendor/
-/web/bundles/
+/test/*
+/vendor/*
+/web/*
