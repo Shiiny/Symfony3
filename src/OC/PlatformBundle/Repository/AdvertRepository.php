@@ -3,7 +3,7 @@
 namespace OC\PlatformBundle\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 
 /**
  * AdvertRepository
@@ -13,65 +13,39 @@ use Doctrine\ORM\QueryBuilder;
  */
 class AdvertRepository extends EntityRepository
 {
-	public function myFindAll()
+	/**
+	 * Récupère toutes les annonces triées par date en liant l'image des annonces et leurs catégories
+	 */
+	public function getAdverts($page, $nbPerPage)
 	{
-		// méthode 1 -> par l'EntityManager
-		$queryBuilder = $this->_em->createQueryBuilder()->select('a')->from($this->_entityName, 'a');
+		$query = $this->createQueryBuilder('a')
+			// Jointure sur l'attribut image
+			->leftJoin('a.image', 'img')
+			->addSelect('img')
+			// Jointure sur l'attribut catégories
+			->leftJoin('a.categories', 'c')
+			->addSelect('c')
+			// Jointure sur l'attribut compétence
+			->leftJoin('a.advertSkill', 's')
+			->addSelect('s')
+			->orderBy('a.date', 'DESC')
+			->getQuery();
 
-		// méthode 2 -> par le raccourci
-		$queryBuilder = $this->createQueryBuilder('a');
+		$query->setFirstResult(($page-1) * $nbPerPage)
+			->setMaxResults($nbPerPage);
 
-		$query = $queryBuilder->getQuery();
-		$results = $query->getResult();
-
-		return $results;
+		return new Paginator($query, true);
 	}
 
-	public function myFindOne($id)
+	public function getAdvertsToPurge(\Datetime $date)
 	{
-		$qb = $this->createQueryBuilder('a');
+		$query = $this->createQueryBuilder('a')
+			->where('a.updatedAt <= :date')
+			->orWhere('a.updatedAt IS NULL AND a.date <= :date')
+			->andWhere('a.applications IS EMPTY')
+			->setParameter('date', $date)
+			->getQuery();
 
-		$qb->where('a.id = :id')->setParameter('id', $id);
-
-		return $qb->getQuery()->getSingleResult();
-	}
-
-	public function whereCurrentYear(QueryBuilder $qb)
-	{
-		$qb
-		  ->andWhere('a.date BETWEEN :start AND :end')
-		  ->setParameter('start', new \Datetime(date('Y').'-01-01'))
-		  ->setParameter('end', new \Datetime(date('Y').'-12-31'));
-	}
-
-	public function myFind()
-	{
-		$qb = $this->createQueryBuilder('a');
-		$qb->where('a.author = :author')->setParameter('author', 'Marine');
-
-		$this->whereCurrentYear($qb);
-
-		$qb->orderBy('a.date', 'DESC');
-
-		return $qb->getQuery()->getResult();
-	}
-
-	public function getAdvertWithApplications()
-	{
-		$qb = $this->createQueryBuilder('a')
-			->leftJoin('a.applications', 'app')
-			->addSelect('app');
-
-		return $qb->getQuery()->getResult();
-	}
-
-	public function getAdvertWithCategories(array $categoryName)
-	{
-		$qb = $this->createQueryBuilder('a')
-			->innerJoin('a.categories', 'cat')
-			->addSelect('cat');
-
-		$qb->where($qb->expr()->in('cat.name', $categoryName));
-		return $qb->getQuery()->getResult();
+		return $query->getResult();
 	}
 }

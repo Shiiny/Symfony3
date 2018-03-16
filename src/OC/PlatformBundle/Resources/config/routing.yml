@@ -14,7 +14,7 @@ oc_platform_view:
 
 oc_platform_view_slug:
     path:    /{year}/{slug}.{_format}
-    defaults: { _controller: OCPlatformBundle:Advert:viewSlug, format: html }
+    defaults: { _controller: OCPlatformBundle:AdvertTest:viewSlug, format: html }
     requirements: 
         year:    \d{4}
         format: html|xml
@@ -37,6 +37,16 @@ oc_platform_delete:
 
 oc_platform_edit-image:
     path:    /advert/edit/{advertId}
-    defaults: { _controller: OCPlatformBundle:Advert:editImage }
+    defaults: { _controller: OCPlatformBundle:AdvertTest:editImage }
     requirements:
         id: \d+
+
+oc_platform_test:
+    path:    /advert/
+    defaults: { _controller: OCPlatformBundle:AdvertTest:test }
+
+oc_platform_purge:
+    path:    /purge/{days}
+    defaults: { _controller: OCPlatformBundle:Advert:purge }
+    requirements:
+        days: \d+

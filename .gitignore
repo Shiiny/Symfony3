@@ -1,5 +1,6 @@
 # Ignore les répertoires de symfony sur lesquels je n'interviens pas
 /app/*
+!/app/config/config.yml
 !/app/config/routing.yml
 !/app/AppKernel.php
 /phpunit.xml

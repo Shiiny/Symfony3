@@ -5,13 +5,18 @@
 {% endblock %}
 
 {% block ocplatform_body %}
+  {% for message in app.session.flashbag.get('notice') %}
+    <div class="alert alert-success" role="alert">
+        <p>Message flash : {{ message }}</p>
+    </div>
+  {% endfor %}
+
 
   <div class="row">
     <div class="row">
       {% if advert.image is not null %}
         <div class="col-md-3">
-          <img src="{{ advert.image.url }}" style="width:110%" alt="{{ advert.image.alt }}">
-          <a href="{{ path('oc_platform_edit-image', {'advertId': advert.id}) }}">changer l'image</a>    
+          <img src="{{ asset(advert.image.webPath) }}" width="200" alt="{{ advert.image.alt }}">
         </div>
       {% endif %} 
 
